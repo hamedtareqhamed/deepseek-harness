@@ -26,9 +26,19 @@ jobs:
           xcodebuild -version
           swift --version
 
-      - name: Build for iOS Simulator
+      - name: Build Swift Package for iOS Simulator
         run: |
-          xcodebuild -scheme DshMobile \
+          SDK_PATH=$(xcrun --sdk iphonesimulator --show-sdk-path)
+          echo "iOS Simulator SDK: $SDK_PATH"
+          swift build --package-path apps/ios \
+            -Xswiftc "-sdk" -Xswiftc "$SDK_PATH" \
+            -Xswiftc "-target" -Xswiftc "arm64-apple-ios16.0-simulator"
+
+      - name: Build with Xcode for iOS Simulator
+        run: |
+          cd apps/ios
+          xcodebuild build \
+            -scheme DshMobile \
             -destination "generic/platform=iOS Simulator" \
-            -package-path apps/ios \
-            build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO
