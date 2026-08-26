@@ -1,0 +1,38 @@
+name: iOS Mobile Client Build
+
+on:
+  push:
+    paths:
+      - 'apps/ios/**'
+      - '.github/workflows/ios-build.yml'
+  pull_request:
+    paths:
+      - 'apps/ios/**'
+      - '.github/workflows/ios-build.yml'
+  workflow_dispatch:
+
+jobs:
+  build-ios:
+    name: Build Swift Package & iOS Target
+    runs-on: macos-14
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: |
+          sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer || sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+          xcodebuild -version
+          swift --version
+
+      - name: Build Swift Package (Host / Mac)
+        run: |
+          swift build --package-path apps/ios
+
+      - name: Build for iOS Simulator
+        run: |
+          xcodebuild -scheme DshMobile \
+            -destination "generic/platform=iOS Simulator" \
+            -package-path apps/ios \
+            build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
