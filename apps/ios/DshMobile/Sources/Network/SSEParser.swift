@@ -7,15 +7,15 @@
 
 import Foundation
 
-public struct SSEEvent {
+public struct SSEEvent: Sendable {
     public let id: String?
     public let event: String?
     public let data: String
 }
 
 public enum SSEParser {
-    /// Parses an AsyncLineSequence into a stream of SSEEvents
-    public static func parse(lines: URLSession.AsyncBytes.Lines) -> AsyncStream<SSEEvent> {
+    /// Parses any AsyncSequence of String lines into a stream of SSEEvents
+    public static func parse<S: AsyncSequence>(lines: S) -> AsyncStream<SSEEvent> where S.Element == String {
         AsyncStream { continuation in
             Task {
                 var currentId: String?
