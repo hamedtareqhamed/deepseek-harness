@@ -24,21 +24,14 @@ jobs:
         run: |
           sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer || sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
           xcodebuild -version
-          swift --version
 
-      - name: Build Swift Package for iOS Simulator
-        run: |
-          SDK_PATH=$(xcrun --sdk iphonesimulator --show-sdk-path)
-          echo "iOS Simulator SDK: $SDK_PATH"
-          swift build --package-path apps/ios \
-            -Xswiftc "-sdk" -Xswiftc "$SDK_PATH" \
-            -Xswiftc "-target" -Xswiftc "arm64-apple-ios16.0-simulator"
-
-      - name: Build with Xcode for iOS Simulator
+      - name: Build with xcodebuild for iOS Simulator
         run: |
           cd apps/ios
           xcodebuild build \
             -scheme DshMobile \
             -destination "generic/platform=iOS Simulator" \
+            -derivedDataPath .build/DerivedData \
             CODE_SIGN_IDENTITY="" \
-            CODE_SIGNING_REQUIRED=NO
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
